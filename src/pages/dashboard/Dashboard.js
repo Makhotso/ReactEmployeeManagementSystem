@@ -4,6 +4,7 @@ import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
 import Table from "react-bootstrap/Table"
 import Button from "react-bootstrap/Button"
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -12,8 +13,10 @@ import Button from "react-bootstrap/Button"
 const Dashboard =() => {
 
     const [employees, setEmployees] =  useState([]);
+    const navigate = useNavigate();
 
-    useEffect( () => {
+
+    useEffect(() => {
 
         const fetchEmployees = async () => {
 
@@ -35,14 +38,26 @@ const Dashboard =() => {
 
     const handleDelete = async (employeeId) =>{
         try {
-            const responce = await fetch (`http://localhost:8080/api/employee/${employeeId}`, {
+            const response = await fetch(`http://localhost:8080/api/employee/${employeeId}`, {
                 method: "DELETE",
             });
+
+            if (response.ok){
+                setEmployees((prevEmployees) => 
+                    prevEmployees.filter((employee) => employee.id !== employeeId)
+                )
+            }
 
             console.log (`Employee with ID ${employeeId} deleted successfully`);
         } catch (error) {
             console.error("Error deleting employee:", error.message);
         }
+ 
+    }
+
+    const handleUpdate = (employeeId) => {
+        navigate(`/employee/${employeeId}`);
+
     }
 
     return (
@@ -69,7 +84,7 @@ const Dashboard =() => {
                         <td>{employee.phone}</td>
                         <td>{employee.department}</td>
                         <td>
-                            <Button variant = "outline-secondary">Update</Button>{""}
+                            <Button variant = "outline-secondary" onClick={() => handleUpdate(employee.id)}>Update</Button>{""}
                             <Button variant = "outline-danger" onClick={() => handleDelete(employee.id)}>Delete</Button>
                         </td>
                     </tr>
